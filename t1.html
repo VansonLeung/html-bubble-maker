@@ -1,0 +1,156 @@
+
+
+<div>
+  <div style="padding: 50px; display: flex; justify-content: center; align-items: center; gap: 30px">
+    <dom-bubble data-direction="bottom" data-height="7px">ABCDEF</dom-bubble>
+    <dom-bubble data-direction="top" data-background="#ccc" data-height="10px" data-border-color="#99d">ABCDEF</dom-bubble>
+    <dom-bubble data-direction="left" data-height="12px" data-position="0%">ABCDEF</dom-bubble>
+    <dom-bubble data-direction="right" data-background="#fdd" data-position="70%" data-min-width="150px" data-min-height="100px" data-border-radius="25px">ABCDEF</dom-bubble>
+  </div>
+
+
+
+
+
+  <div style="display: flex; flex-direction: row; gap: 15px;">
+    <div>
+      <div><label>uuid</label></div>
+      <input data-settings-field data-settings-field-prop="uuid" type="text" />
+    </div>
+
+    <div>
+      <div><label>direction</label></div>
+      <select data-settings-field data-settings-field-prop="direction" size="4">
+        <option value="bottom">bottom</option>
+        <option value="left">left</option>
+        <option value="top">top</option>
+        <option value="right">right</option>
+      </select>
+    </div>
+
+    <div>
+      <div><label>background</label></div>
+      <input data-settings-field data-settings-field-prop="background" type="color" />
+    </div>
+
+    <div>
+      <div><label>borderColor</label></div>
+      <input data-settings-field data-settings-field-prop="borderColor" type="color" />
+    </div>
+
+    <div>
+      <div><label>borderWidth</label></div>
+      <input data-settings-field data-settings-field-prop="borderWidth" type="text" />
+    </div>
+
+    <div>
+      <div><label>position</label></div>
+      <input data-settings-field data-settings-field-prop="position" type="text" />
+    </div>
+
+    <div>
+      <div><label>borderRadius</label></div>
+      <input data-settings-field data-settings-field-prop="borderRadius" type="text" />
+    </div>
+
+    <div>
+      <div><label>height</label></div>
+      <input data-settings-field data-settings-field-prop="height" type="text" />
+    </div>
+
+    <div>
+      <div><label>angle</label></div>
+      <input data-settings-field data-settings-field-prop="angle" type="text" />
+    </div>
+
+    <div>
+      <div><label>minWidth</label></div>
+      <input data-settings-field data-settings-field-prop="minWidth" type="text" />
+    </div>
+
+    <div>
+      <div><label>minHeight</label></div>
+      <input data-settings-field data-settings-field-prop="minHeight" type="text" />
+    </div>
+
+  </div>
+
+
+  <div style="display: flex; gap: 40px;">
+    <div>
+      <div><label>Using JS:</label></div>
+      <textarea data-result style="width: 350px; height: 250px;"></textarea>
+    </div>
+    <div>
+      <div><label>Using DOM:</label></div>
+      <textarea data-result-dom style="width: 350px; height: 250px;"></textarea>
+    </div>
+  </div>
+</div>
+
+<script src="./dombubble.js"></script>
+<script>
+  (() => {
+
+    const domResult = document.querySelectorAll('[data-result]');
+    const domResultDom = document.querySelectorAll('[data-result-dom]');
+
+    const camelToSnakeCase = str => str.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
+
+    const makeResult = (domBubble) => {
+      const res = `
+\<script src="./dombubble.js"\>\<\/script\>
+
+const dom = DOMBubble.make_dom_bubble();
+
+${Object.keys(DOMBubble.dom_default_style).map((propKey) => {
+  return `dom.${propKey} = "${domBubble[propKey]}";`;
+}).join("\n")}
+
+document.body.append(domBubble);
+`.trim();
+
+      domResult.forEach(dom => {dom.value = res;});
+
+
+      const resDom = `
+\<script src="./dombubble.js"\>\<\/script\>
+
+<dom-bubble
+${Object.keys(DOMBubble.dom_default_style).map((propKey) => {
+  return `  data-${camelToSnakeCase(propKey)}="${domBubble[propKey]}"`;
+}).join("\n")}
+>
+[Contents here]
+</dom-bubble>
+`.trim();
+
+      domResultDom.forEach(dom => {dom.value = resDom;});
+    }
+
+
+    var activeDomBubble = null;
+
+    document.querySelectorAll("[data-bubble]").forEach((domBubble) => {
+      domBubble.addEventListener('click', (e) => {
+        Object.keys(DOMBubble.dom_default_style).forEach((propKey) => {
+          const inputField = document.querySelector(`[data-settings-field][data-settings-field-prop='${propKey}']`);
+          inputField.value = domBubble[propKey];
+          makeResult(domBubble);
+          activeDomBubble = domBubble;
+        });
+      });
+    });
+
+    Object.keys(DOMBubble.dom_default_style).forEach((propKey) => {
+      const inputField = document.querySelector(`[data-settings-field][data-settings-field-prop='${propKey}']`);
+      inputField.addEventListener('input', (e) => {
+        if (!activeDomBubble) {return;}
+        activeDomBubble[propKey] = inputField.value;
+        makeResult(activeDomBubble);
+      });
+    });
+
+  })();
+</script>
+
