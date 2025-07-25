@@ -1,5 +1,7 @@
 # DOMBubble
 
+Demo: https://vansonleung.github.io/html-bubble-maker/t1.html
+
 DOMBubble is a JavaScript library that allows you to create and manage custom DOM bubbles with various styling options. The library automatically handles the creation, positioning, and styling of the bubbles based on the provided configuration.
 
 ## Features
